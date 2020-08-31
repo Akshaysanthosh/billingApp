@@ -172,16 +172,15 @@ const DataTableContainer = (props) => {
 
 			 const actionBodyTemplate = (rowdata) => {
 				return (
-				  <Button type="button"  className="edit-button" onClick={() => editItemFunction(rowdata)} buttonlabel={""}>
-					  <i className="icon-edit"></i>
+
+				  <Button type="button"  onClick={() => editItemFunction(rowdata)}  label="edit" >
 				  </Button>
 				);
 			  }
 
 			  const removeBodyTemplate = (rowdata) => {
 				return (
-				  <Button type="button"  className="remove-button" onClick={() => removeItemFunction(rowdata)} buttonlabel={""}>
-					  <i className="icon-remove-sign"></i>
+				  <Button type="button"   onClick={() => removeItemFunction(rowdata)} label="remove" icon="pi-remove">
 				  </Button>
 				);
 			  };
