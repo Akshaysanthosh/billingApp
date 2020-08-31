@@ -7,7 +7,7 @@ import React from 'react'
 
 
       export  const indexFinderFunction=(targetArray,baseArray)=> {
-                     for (let i = 0; i = baseArray.length; i++) {
+                     for (let i = 0; i < baseArray.length; i++) {
                          if (baseArray[i].id == targetArray.id) {
                              return i;
                          }

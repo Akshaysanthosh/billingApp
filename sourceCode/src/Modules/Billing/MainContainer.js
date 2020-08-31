@@ -9,7 +9,7 @@ import { indexFinderFunction } from "../CommonFunctions";
 import { twoSum } from "../CommonFunctions";
 import { showMessage } from "../../Utils/Util";
 import {ToastContainer} from 'react-toastify';
-
+import GraphComponent from "./GraphComponent";
 
 
 
@@ -24,7 +24,8 @@ const MainContainer = (props) => {
 	const [editableData, setEditableData] = useState("");
 	const [categoryData, setCategoryData] = useState([]);
 	const [budgetArray, setBudgetArray] = useState([]);
-	const [budgetWholeArray, setBudgeWholeArray] = useState([]);
+	const [budgetFlag, setBudgetFlag] = useState(false);
+	const [graphFlag, setGraphFlag] = useState(false);
     const { register, handleSubmit } = useForm();
     const BillingMockData = require('../../Utils/MockData.json');
     let categoryArray=[]
@@ -44,17 +45,15 @@ const MainContainer = (props) => {
 				initialSetter()
 			}, []);
 
-
-
     		const editItemFunction = (rowdata) => {
          		setEditableData(rowdata);
+         		console.log(typeof rowdata.date)
          	    if (expandEditTab === true) {
 				  setExpandEditTab(false);
 				} else {
 				  setExpandEditTab(true);
 				}
 		  	 };
-
 
            const removeItemFunction = (rowdata) => {
 				   let tempBillData = billingStateData
@@ -68,10 +67,11 @@ const MainContainer = (props) => {
 			   	showMessage('success', 'Item Removed');
 		   };
 
-
 		   const formEdit = (data) => {
 			   if (data) {
 				   let tempBillData = billingStateData
+				      	console.log('data',data)
+		      	console.log('tempBillData',tempBillData)
 				   let indexFound = indexFinderFunction(data,tempBillData)
 				   tempBillData[indexFound] = data
 				   setBillingStateData(tempBillData)
@@ -140,6 +140,40 @@ const MainContainer = (props) => {
 					 }
 			 }
 
+		   const minimumBudget=(data)=>{
+
+			    for (let i = 0; i < billingStateDataLength; i++ ) {
+                 let tempValue=billingStateData[i].amount
+                 spendValueArray.push(tempValue)
+				 }
+			      let billArray=twoSum(spendValueArray,data.budget_value)
+			      let targetValueArray=billArray[0]
+
+
+					for (let i = 0; i < targetValueArray.length; i++) {
+						let tempValue=targetValueArray[i]
+								for (let i = 0; i < billingStateDataLength; i++) {
+									if(billingStateData[i].amount ==tempValue){
+												let tempArray={
+												id:billingStateData[i].id,
+												description:billingStateData[i].description,
+												category:billingStateData[i].category,
+												date:billingStateData[i].date,
+											}
+											budgetValueArray.push(tempArray)
+										    setBudgetArray(budgetValueArray)
+									}}}
+							setBudgetFlag(true)
+					   }
+
+
+					 const graphDisplay=()=>{
+					 if (expandEditTab === true) {
+						  setGraphFlag(false);
+						} else {
+						  setGraphFlag(true);
+						}
+				   }
 
 			 const actionBodyTemplate = (rowdata) => {
 				return (
@@ -157,41 +191,6 @@ const MainContainer = (props) => {
 				);
 			  };
 
-		   const minimumBudget=(data)=>{
-
-			    for (let i = 0; i < billingStateDataLength; i++ ) {
-                 let tempValue=billingStateData[i].amount
-                 spendValueArray.push(tempValue)
-				 }
-				  setBudgetArray(spendValueArray)
-			      let billArray=twoSum(spendValueArray,data.budget_value)
-			      let targetValueArray=billArray[0]
-			      // let len=targetValueArray.length;
-			      //  console.log('targetValueArray',targetValueArray)
-
-					for (let i = 0; i < targetValueArray.length; i++) {
-						let tempValue=targetValueArray[i]
-						console.log('tempValue',tempValue)
-								for (let i = 0; i < billingStateDataLength; i++) {
-									console.log('billingStateData[i].amount',billingStateData[i].amount)
-									if(billingStateData[i].amount ==tempValue){
-										console.log('if')
-												let tempArray={
-												id:billingStateData[i].id,
-												description:billingStateData[i].description,
-												category:billingStateData[i].category,
-												date:billingStateData[i].date,
-											}
-											budgetValueArray.push(tempArray)
-										    console.log('tempArray',tempArray)
-								            setBudgeWholeArray([...budgetWholeArray,tempArray])
-
-									}
-								}
-
-									 }
-			    console.log('budgetWholeArray',budgetWholeArray)
-			   }
 
 	return (
 		<React.Fragment>
@@ -202,7 +201,6 @@ const MainContainer = (props) => {
 				  <div>
 						<div className="row mt-5">
 						  <div className="col-12">
-							{/*<span className="font-weight-bold">Bill Table</span>*/}
 						  </div>
 						</div>
 					  			<div className="row">
@@ -214,8 +212,8 @@ const MainContainer = (props) => {
 										<div className="w-100 d-flex align-items-left">
 										  <select
 											className="form-control"
-											name="e_sig_req"
-											id="e_sig_req"
+											name="category_select"
+											id="category_select"
 											defaultValue="1"
 											onChange={categorySelectFunction}
 										  >
@@ -279,8 +277,8 @@ const MainContainer = (props) => {
 									  type="number"
 									  name="id"
 									  id="id"
-									  readOnly={true}
 									  ref={register}
+									  readOnly={true}
 									  defaultValue={editableData.id}
 									/>
 								</div>
@@ -424,7 +422,46 @@ const MainContainer = (props) => {
 											</form>
 										</div>
 								  </div>
+
+									{budgetFlag &&(
+											<div>
+												<div className="col-12">
+												<div>
+													<DataTable value={budgetArray}>
+													<Column header="id" type= 'number' field="id"/>
+													<Column header="description" field="description" />
+													<Column header="category" field="category" />
+													<Column header="amount" field="amount" />
+													<Column header="date"  field="date" />
+													<Column body={actionBodyTemplate}/>
+													<Column body={removeBodyTemplate}/>
+												  </DataTable>
+												</div>
+											  </div>
+										</div>
+									)}
+
+									<div className="row mt-5">
+									  <div className="col-12">
+											<div className="form-group">
+													<label>Create time-series chart </label>
+													<button type="submit" value="save" name="save" className="back-button" onClick={graphDisplay}>
+													 Display Graph{" "}
+													</button>
+											</div>
+										  {
+										  	graphFlag &&(
+										  		<div>
+													 <GraphComponent  billingData={billingStateData} dataLength={billingStateDataLength} status={true} />
+												</div>
+											)
+										  }
+									  </div>
+								  </div>
+
+
 								</div>
+
 
 			</section>
 		</React.Fragment>

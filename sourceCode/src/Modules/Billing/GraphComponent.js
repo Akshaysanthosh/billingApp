@@ -5,34 +5,39 @@ import { Card } from 'primereact/card';
 
 const GraphComponent = (props) => {
     const dispatch = useDispatch();
-	const billingData = useSelector(state => state.billing) || '';
 	const [billingStateData, setBillingStateData] =  React.useState({});
 	const [billingStateDataLength, setBillingStateDataLength] =  React.useState({});
-    const BillingMockData = require('../../Utils/MockData.json');
-    let spendValueArray=[]
-    const [expandGraphTab, setExpandGraphTab] = useState(false);
+	const [expandGraphTab, setExpandGraphTab] = useState(false);
     const [graphData, setGraphData] = useState([]);
+    let spendValueArray=[]
+	const billingData = props.billingData || "";
+    const billingDataLength  = props.dataLength || "";
+    const status  = props.status || false;
+
+
+
+
+
 
 
        const initialSetter=()=>{
+           setBillingStateData(billingData)
+		    setBillingStateDataLength(billingDataLength)
+       }
 
-       		setBillingStateData(BillingMockData.bills)
-		    setBillingStateDataLength(BillingMockData.bills.length)
-            dispatch({
-                type:'billingDetails',
-                payload :BillingMockData.bills
-            })}
 
              React.useEffect(() => {
 		        initialSetter()
-	         }, []);
+	         }, [status]);
+
 
             React.useEffect(() => {
+                GraphDataFunction()
                          if(graphData.length>1){
                              setExpandGraphTab(true)
                              console.log('graphData',graphData)
                          }
-                         }, [graphData]);
+                         }, [billingStateData,graphData]);
 
 
          const GraphDataFunction=()=> {
@@ -46,8 +51,8 @@ const GraphComponent = (props) => {
 
 
         const state = {
-          labels: ['January', 'February', 'March',
-                   'April', 'May'],
+          labels: ['1th January', '5 th January', '10 th January',
+                   '15 th January', '20 th January'],
           datasets: [
             {
               label: 'Amount',
@@ -65,19 +70,20 @@ const GraphComponent = (props) => {
 
 	return (
 	    <div>
-            <div className="p-d-flex">Flex Container</div>
-             <h>Graph is loaded </h>
+
+            <div className="p-d-flex">
+                    <h>Graph is loaded </h>
                 <button onClick={GraphDataFunction}>Graph me </button>
             {expandGraphTab && (
             <div>
-                <Card title="Title" subTitle="SubTitle">
+                <Card >
                      <div>
                 <Line
                   data={state}
                   options={{
                     title:{
                       display:true,
-                      text:'Average Rainfall per month',
+                      text:'Spend amount vs time',
                       fontSize:20
                     },
                     legend:{
@@ -89,6 +95,8 @@ const GraphComponent = (props) => {
             </div>
             </Card>
             </div>)}
+            </div>
+
         </div>
 	)
 };
