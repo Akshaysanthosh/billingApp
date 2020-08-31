@@ -7,7 +7,7 @@ import React from 'react'
 
 
       export  const indexFinderFunction=(targetArray,baseArray)=> {
-                     for (let i = 0; i < baseArray.length; i++) {
+                     for (let i = baseArray.length; i--;) {
                          if (baseArray[i].id == targetArray.id) {
                              return i;
                          }
@@ -15,10 +15,10 @@ import React from 'react'
                }
 
 
-      export  const twoSum = (array, sum) => {
+      export  const pairSumIdentifier = (array, sum) => {
         let hashMap = {},
           results = []
-            for (let i = 0; i < array.length; i++){
+            for (let i = array.length; i--;){
                 if (hashMap[array[i]]){
                     results.push([hashMap[array[i]], array[i]])
                 }else{

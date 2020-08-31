@@ -4,9 +4,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { Button } from "primereact/button";
 import { useForm } from "react-hook-form";
-import { arrayReversalFunction } from "../CommonFunctions";
-import { indexFinderFunction } from "../CommonFunctions";
-import { twoSum } from "../CommonFunctions";
+import { indexFinderFunction,pairSumIdentifier,arrayReversalFunction} from "../CommonServices/CommonFunctions";
 import { showMessage } from "../../Utils/Util";
 import {ToastContainer} from 'react-toastify';
 import GraphComponent from "./GraphComponent";
@@ -31,7 +29,6 @@ const MainContainer = (props) => {
     let categoryArray=[]
 	let spendValueArray=[]
 	let budgetValueArray=[]
-
 
 		   const initialSetter=()=>{
 				setBillingStateData(BillingMockData.bills)
@@ -70,13 +67,10 @@ const MainContainer = (props) => {
 		   const formEdit = (data) => {
 			   if (data) {
 				   let tempBillData = billingStateData
-				      	console.log('data',data)
-		      	console.log('tempBillData',tempBillData)
 				   let indexFound = indexFinderFunction(data,tempBillData)
 				   tempBillData[indexFound] = data
 				   setBillingStateData(tempBillData)
 				   setExpandEditTab(false)
-
 				   dispatch({
 					   type: 'billingDetails',
 					   payload: billingStateData
@@ -115,7 +109,7 @@ const MainContainer = (props) => {
 			 let selectedCategory=e.target.value
 				 if(selectedCategory != 'All' && billingStateData ){
 				 	setCategoryFlag(true)
-					for (let i = 0; i < billingStateDataLength; i++) {
+					for (let i = billingStateData.length; i--;) {
 						 if (billingStateData[i].category ==selectedCategory) {
 								let tempValue={
 									id:billingStateData[i].id,
@@ -142,17 +136,16 @@ const MainContainer = (props) => {
 
 		   const minimumBudget=(data)=>{
 
-			    for (let i = 0; i < billingStateDataLength; i++ ) {
+			    for (let i = billingStateData.length; i--;) {
                  let tempValue=billingStateData[i].amount
                  spendValueArray.push(tempValue)
 				 }
-			      let billArray=twoSum(spendValueArray,data.budget_value)
+			      let billArray=pairSumIdentifier(spendValueArray,data.budget_value)
 			      let targetValueArray=billArray[0]
-
-
-					for (let i = 0; i < targetValueArray.length; i++) {
+			      if(typeof targetValueArray !== 'undefined' && targetValueArray.length > 0){
+			      		for (let i = 0; i < targetValueArray.length; i++) {
 						let tempValue=targetValueArray[i]
-								for (let i = 0; i < billingStateDataLength; i++) {
+								for (let i = billingStateData.length; i--;) {
 									if(billingStateData[i].amount ==tempValue){
 												let tempArray={
 												id:billingStateData[i].id,
@@ -164,16 +157,18 @@ const MainContainer = (props) => {
 										    setBudgetArray(budgetValueArray)
 									}}}
 							setBudgetFlag(true)
+							  }
+
 					   }
 
 
-					 const graphDisplay=()=>{
-					 if (expandEditTab === true) {
+		   const graphDisplay=()=>{
+				 if (expandEditTab === true) {
 						  setGraphFlag(false);
-						} else {
+				} else {
 						  setGraphFlag(true);
-						}
-				   }
+					}
+			  }
 
 			 const actionBodyTemplate = (rowdata) => {
 				return (
@@ -244,7 +239,6 @@ const MainContainer = (props) => {
 											</div>
 										  </div>
 										</div>):(
-
 										<div>
 											<div className="col-12">
 											<div>
@@ -269,7 +263,6 @@ const MainContainer = (props) => {
 				{expandEditTab && (
 							<div >
 								<form onSubmit={handleSubmit(formEdit)}>
-
 								<div className="form-group">
 									<label>ID</label>
 									<input
@@ -314,7 +307,6 @@ const MainContainer = (props) => {
 									  ref={register}
 									  defaultValue={editableData.amount}
 									/>
-
 								</div>
 								<div className="form-group">
 									<label>Date</label>
@@ -341,7 +333,6 @@ const MainContainer = (props) => {
 											<span className="text-purple font-weight-bold" onClick={editItemFunction} >Cancel</span>
 										</div>
 									  </div>
-
 							  </div>
 							</form>
 							</div>)}
@@ -349,7 +340,6 @@ const MainContainer = (props) => {
 							{expandAddTab && (
 							<div >
 								<form onSubmit={handleSubmit(addItem)}>
-
 								<div className="form-group">
 									<label>Description</label>
 									<input
@@ -379,7 +369,6 @@ const MainContainer = (props) => {
 									  id="amount"
 									  ref={register}
 									/>
-
 								</div>
 								<div className="form-group">
 									<label>Date</label>
@@ -403,26 +392,23 @@ const MainContainer = (props) => {
 										  </button>
 											<span className="text-purple font-weight-bold" onClick={addItem} >Cancel</span>
 										</div>
-
 									  </div>
-
 							  </div>
 							</form>
 							</div>)}
-
 								<div className="row mt-5">
 								  <div className="col-12">
 										<div className="form-group">
 											<form onSubmit={handleSubmit(minimumBudget)}>
-												<label>Calculate Minimum payable Bill </label>
+												<label>Calculate payable Bill for target monthly budget</label>
 												<input type='number' name='budget_value'  ref={register} mode="decimal"  />
 												<button type="submit" value="save" name="save" className="back-button">
 												Calculate{" "}
 												</button>
+												 <span className="optional ml-auto"> Example:2520</span>
 											</form>
 										</div>
 								  </div>
-
 									{budgetFlag &&(
 											<div>
 												<div className="col-12">
@@ -440,7 +426,6 @@ const MainContainer = (props) => {
 											  </div>
 										</div>
 									)}
-
 									<div className="row mt-5">
 									  <div className="col-12">
 											<div className="form-group">
@@ -458,11 +443,7 @@ const MainContainer = (props) => {
 										  }
 									  </div>
 								  </div>
-
-
 								</div>
-
-
 			</section>
 		</React.Fragment>
 	)

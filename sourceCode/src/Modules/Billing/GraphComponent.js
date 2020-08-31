@@ -15,39 +15,35 @@ const GraphComponent = (props) => {
     const status  = props.status || false;
 
 
-
-
-
-
-
        const initialSetter=()=>{
+           console.log(billingData,'billingData')
            setBillingStateData(billingData)
-		    setBillingStateDataLength(billingDataLength)
+           setBillingStateDataLength(billingDataLength)
        }
 
 
-             React.useEffect(() => {
+       React.useEffect(() => {
 		        initialSetter()
-	         }, [status]);
+       }, []);
 
 
-            React.useEffect(() => {
-                GraphDataFunction()
-                         if(graphData.length>1){
-                             setExpandGraphTab(true)
-                             console.log('graphData',graphData)
-                         }
-                         }, [billingStateData,graphData]);
+       React.useEffect(() => {
+             if(graphData.length>1 ){
+               setExpandGraphTab(true)
+               }else{
+               setExpandGraphTab(false)
+                 }
+               }, [graphData]);
 
-
-         const GraphDataFunction=()=> {
-             for (let i = 0; i < billingStateDataLength; i++ ) {
+       const GraphDataFunction=()=> {
+             console.log(billingStateData,'billingStateData')
+             for (let i = billingStateData.length; i--; ) {
                  let tempValue=billingStateData[i].amount
                  spendValueArray.push(tempValue)
+                 setGraphData(spendValueArray)
+                   console.log(graphData,'graphData')
              }
-             setGraphData(spendValueArray)
          }
-
 
 
         const state = {
@@ -72,31 +68,34 @@ const GraphComponent = (props) => {
 	    <div>
 
             <div className="p-d-flex">
-                    <h>Graph is loaded </h>
-                <button onClick={GraphDataFunction}>Graph me </button>
-            {expandGraphTab && (
+                <div className="form-group">
+							<label>Generate Graph</label>
+							<button type="submit" value="save" name="save" className="back-button" onClick={GraphDataFunction}>Generate{" "}
+							</button>
+				</div>
+
+            {expandGraphTab  && (
             <div>
                 <Card >
                      <div>
-                <Line
-                  data={state}
-                  options={{
-                    title:{
-                      display:true,
-                      text:'Spend amount vs time',
-                      fontSize:20
-                    },
-                    legend:{
-                      display:true,
-                      position:'right'
-                    }
-                  }}
-                />
-            </div>
-            </Card>
+                        <Line
+                          data={state}
+                          options={{
+                            title:{
+                              display:true,
+                              text:'Spend amount vs time',
+                              fontSize:20
+                            },
+                            legend:{
+                              display:true,
+                              position:'right'
+                            }
+                          }}
+                        />
+                    </div>
+                </Card>
             </div>)}
             </div>
-
         </div>
 	)
 };
