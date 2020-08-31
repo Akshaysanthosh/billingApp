@@ -111,12 +111,7 @@ const DataTableContainer = (props) => {
 				 	setCategoryFlag(true)
 					for (let i = billingStateData.length; i--;) {
 						 if (billingStateData[i].category ==selectedCategory) {
-								let tempValue={
-									id:billingStateData[i].id,
-									description:billingStateData[i].description,
-									category:billingStateData[i].category,
-									date:billingStateData[i].date,
-								}
+								let tempValue=billingStateData[i]
 								 categoryArray.push(tempValue)
 								 setCategoryData(categoryArray)
 							 }
@@ -147,12 +142,7 @@ const DataTableContainer = (props) => {
 						let tempValue=targetValueArray[i]
 								for (let i = billingStateData.length; i--;) {
 									if(billingStateData[i].amount ==tempValue){
-												let tempArray={
-												id:billingStateData[i].id,
-												description:billingStateData[i].description,
-												category:billingStateData[i].category,
-												date:billingStateData[i].date,
-											}
+											let tempArray=billingStateData[i]
 											budgetValueArray.push(tempArray)
 										    setBudgetArray(budgetValueArray)
 									}}}
