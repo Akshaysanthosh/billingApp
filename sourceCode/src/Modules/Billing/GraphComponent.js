@@ -1,24 +1,19 @@
 import React, {useState} from 'react';
-import { useSelector,useDispatch } from "react-redux";
 import {Line} from 'react-chartjs-2';
 import { Card } from 'primereact/card';
 
 const GraphComponent = (props) => {
-    const dispatch = useDispatch();
 	const [billingStateData, setBillingStateData] =  React.useState({});
-	const [billingStateDataLength, setBillingStateDataLength] =  React.useState({});
 	const [expandGraphTab, setExpandGraphTab] = useState(false);
     const [graphData, setGraphData] = useState([]);
     let spendValueArray=[]
 	const billingData = props.billingData || "";
-    const billingDataLength  = props.dataLength || "";
-    const status  = props.status || false;
+
 
 
        const initialSetter=()=>{
            console.log(billingData,'billingData')
            setBillingStateData(billingData)
-           setBillingStateDataLength(billingDataLength)
        }
 
 

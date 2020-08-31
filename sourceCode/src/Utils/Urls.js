@@ -3,6 +3,5 @@
  */
 export const RENDER_URL = {
     HOME_URL: '/',
-    GRAPH_URL: '/graph',
 };
 

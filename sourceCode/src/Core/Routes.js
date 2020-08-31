@@ -12,7 +12,6 @@ export const history = createBrowserHistory({
   hashType: "slash"
 });
 const MainContainer = lazy(() => import("../Modules/Billing/MainContainer"));
-const GraphComponent = lazy(() => import("../Modules/Billing/GraphComponent"));
 
 
 const Routes = () => {
@@ -25,11 +24,7 @@ const Routes = () => {
               path={RENDER_URL.HOME_URL}
               component={MainContainer}
             />
-            <Route
-              exact
-              path={RENDER_URL.GRAPH_URL}
-              component={GraphComponent}
-            />
+
           </Switch>
       </Suspense>
     </Router>
