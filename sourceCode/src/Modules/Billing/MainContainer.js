@@ -1,0 +1,433 @@
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import React, { useState } from 'react';
+import { useSelector, useDispatch } from "react-redux";
+import { Button } from "primereact/button";
+import { useForm } from "react-hook-form";
+import { arrayReversalFunction } from "../CommonFunctions";
+import { indexFinderFunction } from "../CommonFunctions";
+import { twoSum } from "../CommonFunctions";
+import { showMessage } from "../../Utils/Util";
+import {ToastContainer} from 'react-toastify';
+
+
+
+
+const MainContainer = (props) => {
+	const dispatch = useDispatch();
+	const billingData = useSelector(state => state.billing) || '';
+	const [billingStateData, setBillingStateData] =  React.useState({});
+	const [billingStateDataLength, setBillingStateDataLength] =  React.useState({});
+	const [expandEditTab, setExpandEditTab] = useState(false);
+	const [expandAddTab, setExpandAddTab] = useState(false);
+	const [categoryFlag, setCategoryFlag] = useState(false);
+	const [editableData, setEditableData] = useState("");
+	const [categoryData, setCategoryData] = useState([]);
+	const [budgetArray, setBudgetArray] = useState([]);
+	const [budgetWholeArray, setBudgeWholeArray] = useState([]);
+    const { register, handleSubmit } = useForm();
+    const BillingMockData = require('../../Utils/MockData.json');
+    let categoryArray=[]
+	let spendValueArray=[]
+	let budgetValueArray=[]
+
+
+		   const initialSetter=()=>{
+				setBillingStateData(BillingMockData.bills)
+				setBillingStateDataLength(BillingMockData.bills.length)
+				dispatch({
+					type:'billingDetails',
+					payload :BillingMockData.bills
+		   })}
+
+            React.useEffect(() => {
+				initialSetter()
+			}, []);
+
+
+
+    		const editItemFunction = (rowdata) => {
+         		setEditableData(rowdata);
+         	    if (expandEditTab === true) {
+				  setExpandEditTab(false);
+				} else {
+				  setExpandEditTab(true);
+				}
+		  	 };
+
+
+           const removeItemFunction = (rowdata) => {
+				   let tempBillData = billingStateData
+			       let indexFound = indexFinderFunction(rowdata,tempBillData)
+				   tempBillData[indexFound] = {}
+				   setBillingStateData(tempBillData)
+					dispatch({
+					   type: 'billingDetails',
+					   payload: billingStateData
+				   })
+			   	showMessage('success', 'Item Removed');
+		   };
+
+
+		   const formEdit = (data) => {
+			   if (data) {
+				   let tempBillData = billingStateData
+				   let indexFound = indexFinderFunction(data,tempBillData)
+				   tempBillData[indexFound] = data
+				   setBillingStateData(tempBillData)
+				   setExpandEditTab(false)
+
+				   dispatch({
+					   type: 'billingDetails',
+					   payload: billingStateData
+				   })
+			   }
+				showMessage('success', 'Item details edited');
+		   }
+
+	   		const addItem = (data) => {
+         	    if (expandAddTab === true) {
+				  setExpandAddTab(false);
+				} else {
+				  setExpandAddTab(true);
+				}
+				if(data.description){
+					let temArray=billingData.billingData
+                    let reversedArray=arrayReversalFunction([],temArray)
+					let nextID=reversedArray[0].id
+					let newItemData={
+						id:nextID+1,
+						description:data.description,
+						category:data.category,
+						amount:data.amount,
+						date:data.date,
+					}
+					setBillingStateData([...billingStateData,newItemData])
+						 dispatch({
+							   type: 'billingDetails',
+							   payload: billingStateData
+					 })
+						showMessage('success', 'New Item Added');
+					}
+		    }
+
+			 const categorySelectFunction=(e)=> {
+			 let selectedCategory=e.target.value
+				 if(selectedCategory != 'All' && billingStateData ){
+				 	setCategoryFlag(true)
+					for (let i = 0; i < billingStateDataLength; i++) {
+						 if (billingStateData[i].category ==selectedCategory) {
+								let tempValue={
+									id:billingStateData[i].id,
+									description:billingStateData[i].description,
+									category:billingStateData[i].category,
+									date:billingStateData[i].date,
+								}
+								 categoryArray.push(tempValue)
+								 setCategoryData(categoryArray)
+							 }
+						 }
+					 dispatch({
+							   type: 'billingDetails',
+							   payload: categoryData
+					 })
+					 } else{
+				 		setCategoryFlag(false)
+						dispatch({
+							   type: 'billingDetails',
+							   payload: BillingMockData.bills
+						   })
+					 }
+			 }
+
+
+			 const actionBodyTemplate = (rowdata) => {
+				return (
+				  <Button type="button"  className="edit-button" onClick={() => editItemFunction(rowdata)} buttonlabel={""}>
+					  <i className="icon-edit"></i>
+				  </Button>
+				);
+			  }
+
+			  const removeBodyTemplate = (rowdata) => {
+				return (
+				  <Button type="button"  className="remove-button" onClick={() => removeItemFunction(rowdata)} buttonlabel={""}>
+					  <i className="icon-remove-sign"></i>
+				  </Button>
+				);
+			  };
+
+		   const minimumBudget=(data)=>{
+
+			    for (let i = 0; i < billingStateDataLength; i++ ) {
+                 let tempValue=billingStateData[i].amount
+                 spendValueArray.push(tempValue)
+				 }
+				  setBudgetArray(spendValueArray)
+			      let billArray=twoSum(spendValueArray,data.budget_value)
+			      let targetValueArray=billArray[0]
+			      // let len=targetValueArray.length;
+			      //  console.log('targetValueArray',targetValueArray)
+
+					for (let i = 0; i < targetValueArray.length; i++) {
+						let tempValue=targetValueArray[i]
+						console.log('tempValue',tempValue)
+								for (let i = 0; i < billingStateDataLength; i++) {
+									console.log('billingStateData[i].amount',billingStateData[i].amount)
+									if(billingStateData[i].amount ==tempValue){
+										console.log('if')
+												let tempArray={
+												id:billingStateData[i].id,
+												description:billingStateData[i].description,
+												category:billingStateData[i].category,
+												date:billingStateData[i].date,
+											}
+											budgetValueArray.push(tempArray)
+										    console.log('tempArray',tempArray)
+								            setBudgeWholeArray([...budgetWholeArray,tempArray])
+
+									}
+								}
+
+									 }
+			    console.log('budgetWholeArray',budgetWholeArray)
+			   }
+
+	return (
+		<React.Fragment>
+			<section>
+				<ToastContainer/>
+				<h1>Billing App</h1>
+				<div>
+				  <div>
+						<div className="row mt-5">
+						  <div className="col-12">
+							{/*<span className="font-weight-bold">Bill Table</span>*/}
+						  </div>
+						</div>
+					  			<div className="row">
+							        <div className="form-group">
+										<label className="w-100 d-flex align-items-end">
+										  Category type
+										  <span className="optional ml-auto">Optional</span>
+										</label>
+										<div className="w-100 d-flex align-items-left">
+										  <select
+											className="form-control"
+											name="e_sig_req"
+											id="e_sig_req"
+											defaultValue="1"
+											onChange={categorySelectFunction}
+										  >
+											<option value="All">All</option>
+											<option value="utility">utility</option>
+											<option value="shopping & Dining">shopping & Dining</option>
+											<option value="education">education</option>
+											<option value="Personal Care">Personal Care</option>
+											<option value="Travel">Travel</option>
+											<option value="shopping">shopping</option>
+											<option value="Food & Dining">Food & Dining</option>
+										  </select>
+										</div>
+									  </div>
+									{(categoryFlag===true)?(
+										<div>
+										 <div className="col-12">
+											<div>
+												<DataTable value={categoryData}>
+												<Column header="id" type= 'number' field="id"/>
+												<Column header="description" field="description" />
+												<Column header="category" field="category" />
+												<Column header="amount" field="amount" />
+												<Column header="date"  field="date" />
+												<Column body={actionBodyTemplate}/>
+												<Column body={removeBodyTemplate}/>
+											  </DataTable>
+											</div>
+										  </div>
+										</div>):(
+
+										<div>
+											<div className="col-12">
+											<div>
+												<DataTable value={billingStateData}>
+												<Column header="id" type= 'number' field="id"/>
+												<Column header="description" field="description" />
+												<Column header="category" field="category" />
+												<Column header="amount" field="amount" />
+												<Column header="date"  field="date" />
+												<Column body={actionBodyTemplate}/>
+												<Column body={removeBodyTemplate}/>
+											  </DataTable>
+											</div>
+										  </div>
+										</div>)}
+						</div>
+					  </div>
+					{!expandAddTab && (<button value="save" type="submit" className="btn primary-button" name="save" onClick={addItem}>Add</button>)}
+
+				</div>
+
+				{expandEditTab && (
+							<div >
+								<form onSubmit={handleSubmit(formEdit)}>
+
+								<div className="form-group">
+									<label>ID</label>
+									<input
+									  className="form-control"
+									  type="number"
+									  name="id"
+									  id="id"
+									  readOnly={true}
+									  ref={register}
+									  defaultValue={editableData.id}
+									/>
+								</div>
+								<div className="form-group">
+									<label>Description</label>
+									<input
+									  className="form-control"
+									  type="text"
+									  name="description"
+									  id="description"
+									  ref={register}
+									  defaultValue={editableData.description}
+									/>
+								</div>
+								<div className="form-group">
+									<label>Category</label>
+									<input
+									  className="form-control"
+									  type="text"
+									  name="category"
+									  id="category"
+									  ref={register}
+									  defaultValue={editableData.category}
+									/>
+								</div>
+								<div className="form-group">
+									<label>Amount</label>
+									<input
+									  className="form-control"
+									  type="text"
+									  name="amount"
+									  id="amount"
+									  ref={register}
+									  defaultValue={editableData.amount}
+									/>
+
+								</div>
+								<div className="form-group">
+									<label>Date</label>
+									<input
+									  className="form-control"
+									  type="date"
+									  name="date"
+									  id="date"
+									  ref={register}
+									  defaultValue={editableData.date}
+									/>
+								</div>
+									<div className='new-line'/>
+								 <div>
+								      <div className="row mt-5 mb-5">
+										<div className="col-12">
+										  <button
+											type="submit"
+											value="save" name="save"
+											className="mr-5 btn complete-button"
+										  >
+											Update{" "}
+										  </button>
+											<span className="text-purple font-weight-bold" onClick={editItemFunction} >Cancel</span>
+										</div>
+									  </div>
+
+							  </div>
+							</form>
+							</div>)}
+
+							{expandAddTab && (
+							<div >
+								<form onSubmit={handleSubmit(addItem)}>
+
+								<div className="form-group">
+									<label>Description</label>
+									<input
+									  className="form-control"
+									  type="text"
+									  name="description"
+									  id="description"
+									  ref={register}
+									/>
+								</div>
+								<div className="form-group">
+									<label>Category</label>
+									<input
+									  className="form-control"
+									  type="text"
+									  name="category"
+									  id="category"
+									  ref={register}
+									/>
+								</div>
+								<div className="form-group">
+									<label>Amount</label>
+									<input
+									  className="form-control"
+									  type="text"
+									  name="amount"
+									  id="amount"
+									  ref={register}
+									/>
+
+								</div>
+								<div className="form-group">
+									<label>Date</label>
+									<input
+									  className="form-control"
+									  type="date"
+									  name="date"
+									  id="date"
+									  ref={register}
+									/>
+								</div>
+									<div className='new-line'/>
+								 <div>
+								      <div className="row mt-5 mb-5">
+										<div className="col-12">
+										  <button
+											type="submit"
+											value="save" name="save"
+											className="mr-5 btn complete-button">
+											Add{" "}
+										  </button>
+											<span className="text-purple font-weight-bold" onClick={addItem} >Cancel</span>
+										</div>
+
+									  </div>
+
+							  </div>
+							</form>
+							</div>)}
+
+								<div className="row mt-5">
+								  <div className="col-12">
+										<div className="form-group">
+											<form onSubmit={handleSubmit(minimumBudget)}>
+												<label>Calculate Minimum payable Bill </label>
+												<input type='number' name='budget_value'  ref={register} mode="decimal"  />
+												<button type="submit" value="save" name="save" className="back-button">
+												Calculate{" "}
+												</button>
+											</form>
+										</div>
+								  </div>
+								</div>
+
+			</section>
+		</React.Fragment>
+	)
+};
+export default MainContainer

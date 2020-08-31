@@ -1,0 +1,40 @@
+
+.w-0p{
+    width: 0!important;
+}
+
+.w-250p{
+    width: 250px!important;
+}
+.ml-0p{
+    margin-left: 0!important;
+}
+.ml-5p{
+    margin-left: 5px!important;
+}
+.ml-250p{
+    margin-left: 250px!important;
+}
+.mr-10p{
+    margin-right: 10px!important;
+}
+
+.mt-10p{
+    margin-top: 10px!important;
+}
+.mt-60p{
+    margin-top: 60px!important;
+}
+.mt-100p{
+    margin-top: 100px;
+}
+.p-15{
+    padding: 15px!important;
+}
+
+.mr-5p{
+    margin-right: 5px!important;
+}
+.h-50p{
+    height: 50px!important;
+}

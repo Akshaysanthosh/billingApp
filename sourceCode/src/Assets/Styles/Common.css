@@ -1,0 +1,22 @@
+.footer{
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    border-top: 1px solid #dadada;
+}
+
+
+.header{
+    position: absolute;
+    top: 40px;
+    width: 100%;
+    border-bottom: 1px solid #dadada;
+}
+
+body .p-dropdown {
+border: none;
+}
+.icon-tile-bg{
+    background: beige;
+    border-radius: 5px;
+}
